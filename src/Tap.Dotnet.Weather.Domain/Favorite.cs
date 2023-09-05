@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Tap.Dotnet.Domain
+namespace Tap.Dotnet.Weather.Domain
 {
     public class Favorite
     {

@@ -1,4 +1,4 @@
-﻿namespace Tap.Dotnet.Web.Application.Models
+﻿namespace Tap.Dotnet.Weather.Application.Models
 {
     public class WeatherForecastViewModel
     {

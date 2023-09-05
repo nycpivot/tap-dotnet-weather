@@ -1,16 +1,12 @@
 using App.Metrics;
 using App.Metrics.Reporting.Wavefront.Builder;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Collections.Immutable;
-using System.Net;
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Domain;
+using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
 using Wavefront.SDK.CSharp.Common.Application;
-using WeatherBit.Domain;
 
-namespace Tap.Dotnet.Api.Weather.Controllers
+namespace Tap.Dotnet.Weather.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -42,47 +38,54 @@ namespace Tap.Dotnet.Api.Weather.Controllers
 
                 using (var httpClient = new HttpClient(handler))
                 {
-                    httpClient.BaseAddress = new Uri(this.apiHelper.WeatherBitUrl);
+                    //httpClient.BaseAddress = new Uri(this.apiHelper.WeatherBitUrl);
 
-                    var key = this.apiHelper.WeatherBitKey;
+                    //var key = this.apiHelper.WeatherBitKey;
 
-                    var response = httpClient.GetAsync($"forecast/daily?postal_code={zipCode}&key={key}").Result;
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        var content = response.Content.ReadAsStringAsync().Result;
+                    //var response = httpClient.GetAsync($"forecast/daily?postal_code={zipCode}&key={key}").Result;
+                    //if (response.StatusCode == HttpStatusCode.OK)
+                    //{
+                    //    var content = response.Content.ReadAsStringAsync().Result;
 
-                        var serializerSettings = new JsonSerializerSettings();
-                        serializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+                    //    var serializerSettings = new JsonSerializerSettings();
+                    //    serializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
                         
-                        var weatherBitInfo = JsonConvert.DeserializeObject<WeatherBitInfo>(content, serializerSettings);
+                    //    var weatherBitInfo = JsonConvert.DeserializeObject<WeatherBitInfo>(content, serializerSettings);
 
-                        weatherInfo.CityName = weatherBitInfo.city_name;
-                        weatherInfo.StateCode = weatherBitInfo.state_code;
-                        weatherInfo.CountryCode = weatherBitInfo.country_code;
-                        weatherInfo.Latitude = weatherBitInfo.lat;
-                        weatherInfo.Longitude = weatherBitInfo.lon;
-                        weatherInfo.TimeZone = weatherBitInfo.timezone;
+                    //    weatherInfo.CityName = weatherBitInfo.city_name;
+                    //    weatherInfo.StateCode = weatherBitInfo.state_code;
+                    //    weatherInfo.CountryCode = weatherBitInfo.country_code;
+                    //    weatherInfo.Latitude = weatherBitInfo.lat;
+                    //    weatherInfo.Longitude = weatherBitInfo.lon;
+                    //    weatherInfo.TimeZone = weatherBitInfo.timezone;
 
-                        foreach(var weatherBitForecast in weatherBitInfo.data)
+                    //    foreach(var weatherBitForecast in weatherBitInfo.data)
+                    //    {
+                    //        var weatherForecast = new WeatherForecast();
+                    //        weatherForecast.Date = Convert.ToDateTime(weatherBitForecast.datetime);
+                    //        weatherForecast.TemperatureC = Convert.ToSingle(weatherBitForecast.temp);
+                    //        weatherForecast.Description = weatherBitForecast.weather.description;
+
+                    //        weatherInfo.Forecast.Add(weatherForecast);
+                    //    }
+                    //}
+                    //else if(response.StatusCode == HttpStatusCode.TooManyRequests)
+                    //{
+                        var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
                         {
-                            var weatherForecast = new WeatherForecast();
-                            weatherForecast.Date = Convert.ToDateTime(weatherBitForecast.datetime);
-                            weatherForecast.TemperatureC = Convert.ToSingle(weatherBitForecast.temp);
-                            weatherForecast.Description = weatherBitForecast.weather.description;
+                            Date = DateTime.Now.AddDays(index),
+                            TemperatureC = Random.Shared.Next(-20, 55),
+                            //Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                        })
+                        .ToArray();
 
-                            weatherInfo.Forecast.Add(weatherForecast);
+                        foreach(var day in forecast)
+                        {
+                            weatherInfo.Forecast.Add(day);
                         }
-                    }
+                    //}
                 }
             }
-
-            //var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            //{
-            //    Date = DateTime.Now.AddDays(index),
-            //    TemperatureC = Random.Shared.Next(-20, 55),
-            //    //Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            //})
-            //.ToArray();
 
             var min = Convert.ToDouble(weatherInfo.Forecast.Min(t => t.TemperatureC));
             var max = Convert.ToDouble(weatherInfo.Forecast.Max(t => t.TemperatureC));

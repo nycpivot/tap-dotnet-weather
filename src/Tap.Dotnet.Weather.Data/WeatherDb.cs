@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using Tap.Dotnet.Domain;
+using Tap.Dotnet.Weather.Domain;
 
-namespace Tap.Dotnet.Api.Data
+namespace Tap.Dotnet.Weather.Data
 {
     public class WeatherDb : DbContext
     {

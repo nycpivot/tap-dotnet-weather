@@ -1,13 +1,7 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using StackExchange.Redis;
-using System.Diagnostics;
-using System.Net.Security;
-using System.Reflection;
-using Tap.Dotnet.Common;
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Web.Application;
-using Tap.Dotnet.Web.Application.Interfaces;
-using Tap.Dotnet.Web.Mvc.Models;
+using Tap.Dotnet.Weather.Application;
+using Tap.Dotnet.Weather.Application.Interfaces;
+using Tap.Dotnet.Weather.Common;
 using Wavefront.SDK.CSharp.DirectIngestion;
 
 var builder = WebApplication.CreateBuilder(args);

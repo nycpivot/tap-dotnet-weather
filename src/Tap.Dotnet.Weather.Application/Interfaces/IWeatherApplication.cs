@@ -1,6 +1,6 @@
-﻿using Tap.Dotnet.Web.Application.Models;
+﻿using Tap.Dotnet.Weather.Application.Models;
 
-namespace Tap.Dotnet.Web.Application.Interfaces
+namespace Tap.Dotnet.Weather.Application.Interfaces
 {
     public interface IWeatherApplication
     {

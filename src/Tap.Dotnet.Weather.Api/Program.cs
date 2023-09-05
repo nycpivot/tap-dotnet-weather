@@ -1,5 +1,4 @@
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Common;
+using Tap.Dotnet.Weather.Common;
 using Wavefront.SDK.CSharp.DirectIngestion;
 
 var builder = WebApplication.CreateBuilder(args);

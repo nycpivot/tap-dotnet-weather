@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections;
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Web.Application.Interfaces;
-using Tap.Dotnet.Web.Mvc.Models;
+using Tap.Dotnet.Weather.Application.Interfaces;
+using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Web.Models;
 
-namespace Tap.Dotnet.Web.Mvc.Controllers
+namespace Tap.Dotnet.Weather.Web.Controllers
 {
     public class EnvironmentController : Controller
     {

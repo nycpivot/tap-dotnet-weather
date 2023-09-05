@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net;
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Domain;
+using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Domain;
 
-namespace Tap.Dotnet.Api.Weather.Controllers
+namespace Tap.Dotnet.Weather.Api.Controllers
 {
     [Route("[controller]")]
     [ApiController]

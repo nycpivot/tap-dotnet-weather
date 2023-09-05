@@ -1,4 +1,4 @@
-namespace Tap.Dotnet.Domain
+namespace Tap.Dotnet.Weather.Domain
 {
     public class WeatherForecast
     {

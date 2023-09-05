@@ -2,13 +2,12 @@
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System.Diagnostics;
-using System.Reflection;
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Web.Application.Interfaces;
-using Tap.Dotnet.Web.Application.Models;
-using Tap.Dotnet.Web.Mvc.Models;
+using Tap.Dotnet.Weather.Application.Interfaces;
+using Tap.Dotnet.Weather.Application.Models;
+using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Web.Models;
 
-namespace Tap.Dotnet.Web.Mvc.Controllers
+namespace Tap.Dotnet.Weather.Web.Controllers
 {
     public class HomeController : Controller
     {
@@ -30,19 +29,9 @@ namespace Tap.Dotnet.Web.Mvc.Controllers
 
         public IActionResult Index(HomeViewModel model)
         {
-            var homeViewModel = new HomeViewModel(); // this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode);
+            var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode);
 
             homeViewModel.Recents = Cache(model.WeatherInfo.ZipCode);
-
-            //var recentZips = this.cache.StringGet(new RedisKey("Recent"));
-            //var zipList = JsonConvert.DeserializeObject<List<string>>(recentZips);
-            //if(!zipList.Any(z => z == model.WeatherInfo.ZipCode))
-            //{
-            //    zipList.Add(model.WeatherInfo.ZipCode);
-            //    recentZips = JsonConvert.SerializeObject(zipList);
-
-            //    this.cache.SetAdd(new RedisKey("Recent"), recentZips);
-            //}
 
             return View(homeViewModel);
         }

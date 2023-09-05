@@ -1,4 +1,4 @@
-﻿namespace Tap.Dotnet.Web.Mvc.Models
+﻿namespace Tap.Dotnet.Weather.Web.Models
 {
     public class LocationViewModel
     {

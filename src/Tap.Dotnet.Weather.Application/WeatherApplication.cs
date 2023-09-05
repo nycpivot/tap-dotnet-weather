@@ -1,12 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System.Diagnostics;
 using System.Net;
-using System.Reflection.Emit;
-using Tap.Dotnet.Common.Interfaces;
-using Tap.Dotnet.Web.Application.Interfaces;
-using Tap.Dotnet.Web.Application.Models;
+using Tap.Dotnet.Weather.Application.Interfaces;
+using Tap.Dotnet.Weather.Application.Models;
+using Tap.Dotnet.Weather.Common;
 
-namespace Tap.Dotnet.Web.Application
+namespace Tap.Dotnet.Weather.Application
 {
     public class WeatherApplication : IWeatherApplication
     {

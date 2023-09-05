@@ -1,8 +1,7 @@
 ﻿using StackExchange.Redis;
-using Tap.Dotnet.Common.Interfaces;
 using Wavefront.SDK.CSharp.Common;
 
-namespace Tap.Dotnet.Common
+namespace Tap.Dotnet.Weather.Common
 {
     public class ApiHelper : IApiHelper
     {

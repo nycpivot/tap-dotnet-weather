@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Tap.Dotnet.Domain;
+using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
 
-namespace Tap.Dotnet.Api.Data.Controllers
+namespace Tap.Dotnet.Weather.Data.Controllers
 {
     [ApiController]
     [Route("[controller]")]
