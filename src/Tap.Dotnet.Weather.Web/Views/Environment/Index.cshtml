@@ -1,0 +1,28 @@
+﻿﻿<div class="text-center">
+    <h1 class="display-6">Environment</h1>
+
+    <table>
+        @foreach (var variable in ViewBag.Variables)
+        {
+            <tr>
+                @if (variable.Key == "SERVICE_BINDING_ROOT")
+                {
+                    <td style="text-align: left; font-weight: bold;">@variable.Key</td>
+                    <td style="text-align: left; font-weight: bold;">@variable.Value</td>
+                }
+                else
+                {
+                    <td style="text-align: left;">@variable.Key</td>
+                    <td style="text-align: left;">@variable.Value</td>
+                }
+            </tr>
+        }
+    </table>
+
+    <table>
+        <tr>
+            <td>@ViewBag.SecretPath</td>
+            <td><a href="@ViewBag.WeatherApi/weatherforecast" target="_blank">@ViewBag.WeatherApi</a></td>
+        </tr>
+    </table>
+</div>

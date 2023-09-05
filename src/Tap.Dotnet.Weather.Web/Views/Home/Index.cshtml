@@ -1,0 +1,68 @@
+﻿@model Tap.Dotnet.Web.Application.Models.HomeViewModel
+
+<p>@Html.ValidationMessage("Index")</p>
+
+<div class="text-center">
+    <div class="row">
+        <div class="col-1">
+            <h5 class="display-5">Favorites</h5>
+            @{
+                foreach (var favorite in Model.Favorites)
+                {
+                    <div>@favorite.ZipCode</div>
+                }
+            }
+            <h5 class="display-5">Recent</h5>
+            @{
+                foreach (var recent in Model.Recents)
+                {
+                    <div>@recent.ZipCode</div>
+                }
+            }
+        </div>
+        <div class="col-11">
+            <h1 class="display-4">Weather Watch</h1>
+            @using (Html.BeginForm("Search", "Home", FormMethod.Post))
+            {
+                @Html.TextBoxFor(model => model.WeatherInfo.ZipCode)
+                <button type="submit">Get Forecast</button>
+            }
+            <br />
+            <br />
+            @using (Html.BeginForm("Save", "Home", FormMethod.Post))
+            {
+                <h3>@Model.WeatherInfo.CityName, @Model.WeatherInfo.StateCode @Model.WeatherInfo.CountryCode</h3>
+                @Html.HiddenFor(model => model.WeatherInfo.ZipCode)
+                <button type="submit">Add To Favorites</button>
+            }
+            <br />
+            <br />
+            <div class="text-center border-top">
+                <h6 class="display-6">5-day Forecast</h6>
+                <table style="width:100%;">
+                    <tr>
+                        <td>@Model.WeatherInfo.Forecast[0].Date.DayOfWeek</td>
+                        <td>@Model.WeatherInfo.Forecast[1].Date.DayOfWeek</td>
+                        <td>@Model.WeatherInfo.Forecast[2].Date.DayOfWeek</td>
+                        <td>@Model.WeatherInfo.Forecast[3].Date.DayOfWeek</td>
+                        <td>@Model.WeatherInfo.Forecast[4].Date.DayOfWeek</td>
+                    </tr>
+                    <tr>
+                        <td>@Model.WeatherInfo.Forecast[0].TemperatureF℉</td>
+                        <td>@Model.WeatherInfo.Forecast[1].TemperatureF℉</td>
+                        <td>@Model.WeatherInfo.Forecast[2].TemperatureF℉</td>
+                        <td>@Model.WeatherInfo.Forecast[3].TemperatureF℉</td>
+                        <td>@Model.WeatherInfo.Forecast[4].TemperatureF℉</td>
+                    </tr>
+                    <tr>
+                        <td>@Model.WeatherInfo.Forecast[0].Description</td>
+                        <td>@Model.WeatherInfo.Forecast[1].Description</td>
+                        <td>@Model.WeatherInfo.Forecast[2].Description</td>
+                        <td>@Model.WeatherInfo.Forecast[3].Description</td>
+                        <td>@Model.WeatherInfo.Forecast[4].Description</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
