@@ -15,10 +15,14 @@ var weatherApi = Environment.GetEnvironmentVariable("WEATHER_API") ?? String.Emp
 // read secrets from files
 var wavefrontUrl = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "host"));
 var wavefrontToken = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "token"));
-var cacheConnection = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "redis-cache-class-claim", "connection"));
+var cacheHost = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "redis-cache-class-claim", "host"));
+var cachePort = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "redis-cache-class-claim", "port"));
+var cachePassword = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "redis-cache-class-claim", "password"));
+
+var cacheConfig = $"{cacheHost}:{cachePort},password={cachePassword}";
 
 // setup Redis cache
-var redisConnection = ConnectionMultiplexer.Connect(cacheConnection);
+var redisConnection = ConnectionMultiplexer.Connect(cacheConfig);
 // var cacheServer = redisConnection.GetServer(cacheConnection);
 var cacheDb = redisConnection.GetDatabase();
 
