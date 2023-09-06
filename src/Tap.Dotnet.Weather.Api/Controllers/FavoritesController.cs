@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Net;
 using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
+using Wavefront.SDK.CSharp.Common;
 
 namespace Tap.Dotnet.Weather.Api.Controllers
 {
@@ -11,11 +15,16 @@ namespace Tap.Dotnet.Weather.Api.Controllers
     public class FavoritesController : ControllerBase
     {
         private readonly IWeatherDataService weatherDataService;
+        private readonly IWavefrontSender wavefrontSender;
         private readonly ILogger<ForecastController> logger;
 
-        public FavoritesController(IWeatherDataService weatherDataService, ILogger<ForecastController> logger)
+        public FavoritesController(
+            IWeatherDataService weatherDataService,
+            IWavefrontSender wavefrontSender,
+            ILogger<ForecastController> logger)
         {
             this.weatherDataService = weatherDataService;
+            this.wavefrontSender = wavefrontSender;
             this.logger = logger;
         }
 
@@ -23,6 +32,17 @@ namespace Tap.Dotnet.Weather.Api.Controllers
         public IEnumerable<Favorite> Get()
         {
             var favorites = new List<Favorite>();
+
+            var traceId = this.Request.Headers["X-TraceId"][0];
+            var spanId = this.Request.Headers["X-SpanId"][0];
+
+            this.wavefrontSender.SendSpan(
+                "Get", 0, 1, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
+                    new KeyValuePair<string, string>("service", "WeatherApi.FavoritesController"),
+                    new KeyValuePair<string, string>("http.method", "GET")), null);
 
             using (var handler = new HttpClientHandler())
             {
@@ -34,6 +54,8 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                 using (var httpClient = new HttpClient(handler))
                 {
                     httpClient.BaseAddress = new Uri(this.weatherDataService.Url);
+                    httpClient.DefaultRequestHeaders.Add("X-TraceId", traceId.ToString());
+                    httpClient.DefaultRequestHeaders.Add("X-SpanId", spanId.ToString());
 
                     var response = httpClient.GetAsync($"favorites").Result;
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -61,6 +83,17 @@ namespace Tap.Dotnet.Weather.Api.Controllers
         {
             var favorites = new List<Favorite>();
 
+            var traceId = this.Request.Headers["X-TraceId"][0];
+            var spanId = this.Request.Headers["X-SpanId"][0];
+
+            this.wavefrontSender.SendSpan(
+                "Save", 0, 1, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
+                    new KeyValuePair<string, string>("service", "WeatherApi.FavoritesController"),
+                    new KeyValuePair<string, string>("http.method", "POST")), null);
+
             using (var handler = new HttpClientHandler())
             {
                 handler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
@@ -71,6 +104,8 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                 using (var httpClient = new HttpClient(handler))
                 {
                     httpClient.BaseAddress = new Uri(this.weatherDataService.Url);
+                    httpClient.DefaultRequestHeaders.Add("X-TraceId", traceId.ToString());
+                    httpClient.DefaultRequestHeaders.Add("X-SpanId", spanId.ToString());
 
                     var result = httpClient.GetAsync($"favorites/{zipCode}").Result;
                 }

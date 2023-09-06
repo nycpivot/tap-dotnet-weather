@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using Tap.Dotnet.Weather.Application.Interfaces;
 using Tap.Dotnet.Weather.Application.Models;
 using Tap.Dotnet.Weather.Web.Models;
+using Wavefront.SDK.CSharp.Common;
 
 namespace Tap.Dotnet.Weather.Web.Controllers
 {
@@ -12,18 +14,33 @@ namespace Tap.Dotnet.Weather.Web.Controllers
     {
         private readonly IDatabase cache;
         private readonly IWeatherApplication weatherApplication;
+        private readonly IWavefrontSender wavefrontSender;
         private readonly ILogger<HomeController> logger;
 
-        public HomeController(IDatabase cache, IWeatherApplication weatherApplication, ILogger<HomeController> logger)
+        public HomeController(
+            IDatabase cache, IWeatherApplication weatherApplication,
+            IWavefrontSender wavefrontSender, ILogger<HomeController> logger)
         {
             this.cache = cache;
             this.weatherApplication = weatherApplication;
+            this.wavefrontSender = wavefrontSender;
             this.logger = logger;
         }
 
         public IActionResult Index(HomeViewModel model)
         {
-            var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode);
+            var traceId = Guid.NewGuid();
+            var spanId = Guid.NewGuid();
+
+            this.wavefrontSender.SendSpan(
+                "Index", 0, 1, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("service", "Index"),
+                    new KeyValuePair<string, string>("http.method", "GET")), null);
+
+            var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode, traceId, spanId);
 
             homeViewModel.Recents = Cache(model.WeatherInfo.ZipCode);
 
@@ -33,7 +50,18 @@ namespace Tap.Dotnet.Weather.Web.Controllers
         [HttpPost]
         public ActionResult Search(HomeViewModel model)
         {
-            var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode);
+            var traceId = Guid.NewGuid();
+            var spanId = Guid.NewGuid();
+
+            this.wavefrontSender.SendSpan(
+                "Search", 0, 1, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("service", "Search"),
+                    new KeyValuePair<string, string>("http.method", "GET")), null);
+
+            var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode, traceId, spanId);
 
             homeViewModel.Recents = Cache(model.WeatherInfo.ZipCode);
 
@@ -43,7 +71,18 @@ namespace Tap.Dotnet.Weather.Web.Controllers
         [HttpPost]
         public ActionResult Save(HomeViewModel model)
         {
-            var homeViewModel = this.weatherApplication.SaveFavorite(model.WeatherInfo.ZipCode);
+            var traceId = Guid.NewGuid();
+            var spanId = Guid.NewGuid();
+
+            this.wavefrontSender.SendSpan(
+                "Save", 0, 1, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("service", "Save"),
+                    new KeyValuePair<string, string>("http.method", "POST")), null);
+
+            var homeViewModel = this.weatherApplication.SaveFavorite(model.WeatherInfo.ZipCode, traceId, spanId);
 
             homeViewModel.Recents = Cache(model.WeatherInfo.ZipCode);
 

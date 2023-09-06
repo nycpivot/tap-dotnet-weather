@@ -1,6 +1,9 @@
 using App.Metrics;
 using App.Metrics.Reporting.Wavefront.Builder;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System;
 using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
@@ -113,12 +116,12 @@ namespace Tap.Dotnet.Weather.Api.Controllers
 
             // save as storage in wavefront
             this.wavefrontSender.SendMetric("MinimumRandomForecast", min,
-                DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow), "tap-dotnet-api-weather-env", tags);
+                DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow), "tap-dotnet-weather-api", tags);
             this.wavefrontSender.SendMetric("MaximumRandomForecast", max,
-                DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow), "tap-dotnet-api-weather-env", tags);
+                DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow), "tap-dotnet-weather-api", tags);
 
             // report metrics
-            var applicationTags = new ApplicationTags.Builder("tap-dotnet-api-weather-env", "forecast-controller").Build();
+            var applicationTags = new ApplicationTags.Builder("tap-dotnet-weather-api", "forecast-controller").Build();
 
             var metricsBuilder = new MetricsBuilder();
 
@@ -126,23 +129,26 @@ namespace Tap.Dotnet.Weather.Api.Controllers
               options =>
               {
                   options.WavefrontSender = this.wavefrontSender;
-                  options.Source = "tap-dotnet-api-weather"; // optional
+                  options.Source = "tap-dotnet-weather-api"; // optional
                   options.WavefrontHistogram.ReportMinuteDistribution = true; // optional
                   options.ApplicationTags = applicationTags;
               });
 
             var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
 
-            var traceHeader = this.Request.Headers["X-TraceId"];
+            if(this.Request.Headers.ContainsKey("X-TraceId") && this.Request.Headers.ContainsKey("X-SpanId"))
+            {
+                var traceId = this.Request.Headers["X-TraceId"][0];
+                var spanId = this.Request.Headers["X-SpanId"][0];
 
-            //this.apiHelper.WavefrontSender.SendSpan(
-            //    "GetWeatherForecast", start, end, "ForecastController",
-            //    new Guid(traceHeader[0]), Guid.NewGuid(),
-            //    ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
-            //    ImmutableList.Create(
-            //        new KeyValuePair<string, string>("application", "tap-dotnet-api-weather"),
-            //        new KeyValuePair<string, string>("service", "ForecastController"),
-            //        new KeyValuePair<string, string>("http.method", "GET")), null);
+                this.wavefrontSender.SendSpan(
+                    "Get", 0, 1, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                    ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                    ImmutableList.Create(
+                        new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
+                        new KeyValuePair<string, string>("service", "WeatherApi.ForecastController"),
+                        new KeyValuePair<string, string>("http.method", "GET")), null);
+            }
 
             return weatherInfo;
         }

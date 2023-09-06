@@ -4,7 +4,7 @@ namespace Tap.Dotnet.Weather.Application.Interfaces
 {
     public interface IWeatherApplication
     {
-        HomeViewModel GetForecast(string zipCode);
-        HomeViewModel SaveFavorite(string zipCode);
+        HomeViewModel GetForecast(string zipCode, Guid traceId, Guid spanId);
+        HomeViewModel SaveFavorite(string zipCode, Guid traceId, Guid spanId);
     }
 }

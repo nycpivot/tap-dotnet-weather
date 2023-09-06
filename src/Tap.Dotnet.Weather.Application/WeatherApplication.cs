@@ -19,23 +19,20 @@ namespace Tap.Dotnet.Weather.Application
             this.wavefrontSender = sender;
         }
 
-        public HomeViewModel GetForecast(string zipCode)
+        public HomeViewModel GetForecast(string zipCode, Guid traceId, Guid spanId)
         {
-            var homeViewModel = GetHomeView(zipCode);
+            var homeViewModel = GetHomeView(zipCode, traceId, spanId);
 
             return homeViewModel;
         }
 
-        public HomeViewModel SaveFavorite(string zipCode)
+        public HomeViewModel SaveFavorite(string zipCode, Guid traceId, Guid spanId)
         {
             var homeViewModel = new HomeViewModel();
 
-            var traceId = Guid.NewGuid();
-            var spanId = Guid.NewGuid();
-
             this.wavefrontSender.SendSpan(
-                "Post", 0, 1, "WeatherApplication", traceId, spanId,
-                ImmutableList.Create(traceId), ImmutableList.Create(traceId),
+                "Post", 0, 1, "WeatherApplication", traceId, Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "SaveFavorite"),
@@ -52,29 +49,27 @@ namespace Tap.Dotnet.Weather.Application
                 {
                     httpClient.BaseAddress = new Uri(this.weatherApi.Url);
                     httpClient.DefaultRequestHeaders.Add("X-TraceId", traceId.ToString());
+                    httpClient.DefaultRequestHeaders.Add("X-SpanId", spanId.ToString());
 
                     var result = httpClient.GetAsync($"favorites/{zipCode}").Result;
                 }
             }
 
-            homeViewModel = GetHomeView(zipCode);
+            homeViewModel = GetHomeView(zipCode, traceId, spanId);
 
             return homeViewModel;
         }
 
-        private HomeViewModel GetHomeView(string zipCode)
+        private HomeViewModel GetHomeView(string zipCode, Guid traceId, Guid spanId)
         {
             var homeViewModel = new HomeViewModel();
 
-            var traceId = Guid.NewGuid();
-            var spanId = Guid.NewGuid();
-
             this.wavefrontSender.SendSpan(
-                "Get", 0, 1, "WeatherApplication", traceId, spanId,
-                ImmutableList.Create(traceId), ImmutableList.Create(traceId),
+                "Get", 0, 1, "WeatherApplication", traceId, Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
-                    new KeyValuePair<string, string>("service", "GetHomeView"),
+                    new KeyValuePair<string, string>("service", "WeatherApplication.GetHomeView"),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
             using (var handler = new HttpClientHandler())
@@ -88,6 +83,7 @@ namespace Tap.Dotnet.Weather.Application
                 {
                     httpClient.BaseAddress = new Uri(this.weatherApi.Url);
                     httpClient.DefaultRequestHeaders.Add("X-TraceId", traceId.ToString());
+                    httpClient.DefaultRequestHeaders.Add("X-SpanId", spanId.ToString());
 
                     // get saved favorite zip codes
                     var favoritesResponse = httpClient.GetAsync("favorites").Result;
