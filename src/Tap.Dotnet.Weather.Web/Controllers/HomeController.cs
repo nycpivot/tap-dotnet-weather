@@ -7,6 +7,7 @@ using Tap.Dotnet.Weather.Application.Interfaces;
 using Tap.Dotnet.Weather.Application.Models;
 using Tap.Dotnet.Weather.Web.Models;
 using Wavefront.SDK.CSharp.Common;
+using Wavefront.SDK.CSharp.DirectIngestion;
 
 namespace Tap.Dotnet.Weather.Web.Controllers
 {
@@ -14,12 +15,12 @@ namespace Tap.Dotnet.Weather.Web.Controllers
     {
         private readonly IDatabase cache;
         private readonly IWeatherApplication weatherApplication;
-        private readonly IWavefrontSender wavefrontSender;
+        private readonly WavefrontDirectIngestionClient wavefrontSender;
         private readonly ILogger<HomeController> logger;
 
         public HomeController(
             IDatabase cache, IWeatherApplication weatherApplication,
-            IWavefrontSender wavefrontSender, ILogger<HomeController> logger)
+            WavefrontDirectIngestionClient wavefrontSender, ILogger<HomeController> logger)
         {
             this.cache = cache;
             this.weatherApplication = weatherApplication;
@@ -33,10 +34,10 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             var spanId = Guid.NewGuid();
 
             this.wavefrontSender.SendSpan(
-                "Index", 0, 1, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                "Index", 0, 1, "tap-dotnet-core-web-mvc-env", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
-                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("application", "tap-dotnet-core-web-mvc-env"), // "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "Index"),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
@@ -54,10 +55,10 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             var spanId = Guid.NewGuid();
 
             this.wavefrontSender.SendSpan(
-                "Search", 0, 1, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                "Search", 0, 1, "tap-dotnet-core-web-mvc-env", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
-                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("application", "tap-dotnet-core-web-mvc-env"),
                     new KeyValuePair<string, string>("service", "Search"),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
@@ -75,10 +76,10 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             var spanId = Guid.NewGuid();
 
             this.wavefrontSender.SendSpan(
-                "Save", 0, 1, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                "Save", 0, 1, "tap-dotnet-core-web-mvc-env", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
-                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("application", "tap-dotnet-core-web-mvc-env"),
                     new KeyValuePair<string, string>("service", "Save"),
                     new KeyValuePair<string, string>("http.method", "POST")), null);
 

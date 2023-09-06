@@ -4,16 +4,17 @@ using System.Net;
 using Tap.Dotnet.Weather.Application.Interfaces;
 using Tap.Dotnet.Weather.Application.Models;
 using Wavefront.SDK.CSharp.Common;
+using Wavefront.SDK.CSharp.DirectIngestion;
 
 namespace Tap.Dotnet.Weather.Application
 {
     public class WeatherApplication : IWeatherApplication
     {
         private readonly IWeatherApi weatherApi;
-        private readonly IWavefrontSender wavefrontSender;
+        private readonly WavefrontDirectIngestionClient wavefrontSender;
         // private readonly IApiHelper apiHelper;
 
-        public WeatherApplication(IWeatherApi weatherApi, IWavefrontSender sender)
+        public WeatherApplication(IWeatherApi weatherApi, WavefrontDirectIngestionClient sender)
         {
             this.weatherApi = weatherApi;
             this.wavefrontSender = sender;
@@ -69,7 +70,7 @@ namespace Tap.Dotnet.Weather.Application
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
-                    new KeyValuePair<string, string>("service", "WeatherApplication.GetHomeView"),
+                    new KeyValuePair<string, string>("service", "GetHomeView"),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
             using (var handler = new HttpClientHandler())
