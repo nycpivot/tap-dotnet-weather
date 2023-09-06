@@ -11,8 +11,8 @@ var serviceBindings = Environment.GetEnvironmentVariable("SERVICE_BINDING_ROOT")
 
 var weatherDbApi = Environment.GetEnvironmentVariable("WEATHER_DB_API") ?? String.Empty;
 
-var weatherBitUrl = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "weather-bit-resource-claim", "host"));
-var weatherBitKey = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "weather-bit-resource-claim", "key"));
+var weatherBitUrl = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "weather-bit-api-resource-claim", "host"));
+var weatherBitKey = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "weather-bit-api-resource-claim", "key"));
 var wavefrontUrl = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "host"));
 var wavefrontToken = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "token"));
 
