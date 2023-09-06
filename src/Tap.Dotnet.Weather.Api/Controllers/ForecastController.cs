@@ -15,6 +15,11 @@ namespace Tap.Dotnet.Weather.Api.Controllers
         private readonly IApiHelper apiHelper;
         private readonly ILogger<ForecastController> logger;
 
+        private static readonly string[] Summaries = new[]
+{
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+        };
+
         public ForecastController(IApiHelper apiHelper, ILogger<ForecastController> logger)
         {
             this.apiHelper = apiHelper;
@@ -49,7 +54,7 @@ namespace Tap.Dotnet.Weather.Api.Controllers
 
                     //    var serializerSettings = new JsonSerializerSettings();
                     //    serializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
-                        
+
                     //    var weatherBitInfo = JsonConvert.DeserializeObject<WeatherBitInfo>(content, serializerSettings);
 
                     //    weatherInfo.CityName = weatherBitInfo.city_name;
@@ -71,11 +76,15 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                     //}
                     //else if(response.StatusCode == HttpStatusCode.TooManyRequests)
                     //{
+                    weatherInfo.CityName = "Palo Alto";
+                    weatherInfo.StateCode = "CA";
+                    weatherInfo.CountryCode = "US";
+
                         var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
                         {
                             Date = DateTime.Now.AddDays(index),
                             TemperatureC = Random.Shared.Next(-20, 55),
-                            //Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                            Description = Summaries[Random.Shared.Next(Summaries.Length)]
                         })
                         .ToArray();
 
