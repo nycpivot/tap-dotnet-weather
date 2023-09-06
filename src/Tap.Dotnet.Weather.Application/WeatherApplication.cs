@@ -2,17 +2,20 @@
 using System.Net;
 using Tap.Dotnet.Weather.Application.Interfaces;
 using Tap.Dotnet.Weather.Application.Models;
-using Tap.Dotnet.Weather.Common;
+using Wavefront.SDK.CSharp.Common;
 
 namespace Tap.Dotnet.Weather.Application
 {
     public class WeatherApplication : IWeatherApplication
     {
-        private readonly IApiHelper apiHelper;
+        private readonly IWeatherApi weatherApi;
+        private readonly IWavefrontSender wavefrontSender;
+        // private readonly IApiHelper apiHelper;
 
-        public WeatherApplication(IApiHelper apiHelper)
+        public WeatherApplication(IWeatherApi weatherApi, IWavefrontSender sender)
         {
-            this.apiHelper = apiHelper;
+            this.weatherApi = weatherApi;
+            this.wavefrontSender = sender;
         }
 
         public HomeViewModel GetForecast(string zipCode)
@@ -46,7 +49,7 @@ namespace Tap.Dotnet.Weather.Application
 
                 using (var httpClient = new HttpClient(handler))
                 {
-                    httpClient.BaseAddress = new Uri(this.apiHelper.WeatherApi);
+                    httpClient.BaseAddress = new Uri(this.weatherApi.Url);
                     httpClient.DefaultRequestHeaders.Add("X-TraceId", traceId.ToString());
 
                     var result = httpClient.GetAsync($"favorites/{zipCode}").Result;
@@ -82,7 +85,7 @@ namespace Tap.Dotnet.Weather.Application
 
                 using (var httpClient = new HttpClient(handler))
                 {
-                    httpClient.BaseAddress = new Uri(this.apiHelper.WeatherApi);
+                    httpClient.BaseAddress = new Uri(this.weatherApi.Url);
                     httpClient.DefaultRequestHeaders.Add("X-TraceId", traceId.ToString());
 
                     // get saved favorite zip codes

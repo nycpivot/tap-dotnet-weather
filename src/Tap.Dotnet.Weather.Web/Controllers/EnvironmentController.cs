@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using Tap.Dotnet.Weather.Application.Interfaces;
-using Tap.Dotnet.Weather.Common;
 using Tap.Dotnet.Weather.Web.Models;
 
 namespace Tap.Dotnet.Weather.Web.Controllers
@@ -9,16 +8,13 @@ namespace Tap.Dotnet.Weather.Web.Controllers
     public class EnvironmentController : Controller
     {
         private readonly IWeatherApplication weatherApplication;
-        private readonly IApiHelper apiHelper;
         private readonly ILogger<HomeController> _logger;
 
         public EnvironmentController(
             IWeatherApplication weatherApplication,
-            IApiHelper apiHelper,
             ILogger<HomeController> logger)
         {
             this.weatherApplication = weatherApplication;
-            this.apiHelper = apiHelper;
             _logger = logger;
         }
 

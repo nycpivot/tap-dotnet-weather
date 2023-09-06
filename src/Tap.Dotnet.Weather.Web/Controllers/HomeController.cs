@@ -4,7 +4,6 @@ using StackExchange.Redis;
 using System.Diagnostics;
 using Tap.Dotnet.Weather.Application.Interfaces;
 using Tap.Dotnet.Weather.Application.Models;
-using Tap.Dotnet.Weather.Common;
 using Tap.Dotnet.Weather.Web.Models;
 
 namespace Tap.Dotnet.Weather.Web.Controllers
@@ -13,17 +12,12 @@ namespace Tap.Dotnet.Weather.Web.Controllers
     {
         private readonly IDatabase cache;
         private readonly IWeatherApplication weatherApplication;
-        private readonly IApiHelper apiHelper;
         private readonly ILogger<HomeController> logger;
 
-        public HomeController(
-            IDatabase cache,
-            IWeatherApplication weatherApplication,
-            IApiHelper apiHelper, ILogger<HomeController> logger)
+        public HomeController(IDatabase cache, IWeatherApplication weatherApplication, ILogger<HomeController> logger)
         {
             this.cache = cache;
             this.weatherApplication = weatherApplication;
-            this.apiHelper = apiHelper;
             this.logger = logger;
         }
 

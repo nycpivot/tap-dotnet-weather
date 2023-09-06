@@ -11,8 +11,4 @@
     <PackageReference Include="Wavefront.AspNetCore.SDK.CSharp" Version="1.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Tap.Dotnet.Weather.Common\Tap.Dotnet.Weather.Common.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -19,9 +19,8 @@ var weatherDbConnectionString = $"Host={weatherDbHost}; Database={weatherDbName}
 
 builder.Services.AddDbContext<WeatherDb>(options => options.UseNpgsql(weatherDbConnectionString));
 
-// setup monitoring with wavefront
+// setup wavefront
 var wfSender = new WavefrontDirectIngestionClient.Builder(wavefrontUrl, wavefrontToken).Build();
-
 builder.Services.AddSingleton<IWavefrontSender>(wfSender);
 
 builder.Services.AddControllers();

@@ -1,10 +1,11 @@
 using App.Metrics;
 using App.Metrics.Reporting.Wavefront.Builder;
 using Microsoft.AspNetCore.Mvc;
-using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
 using Wavefront.SDK.CSharp.Common.Application;
+using WeatherBit.Domain.Interfaces;
 
 namespace Tap.Dotnet.Weather.Api.Controllers
 {
@@ -12,7 +13,9 @@ namespace Tap.Dotnet.Weather.Api.Controllers
     [Route("[controller]")]
     public class ForecastController : ControllerBase
     {
-        private readonly IApiHelper apiHelper;
+        private readonly IWeatherBitService weatherBitService;
+        private readonly IWavefrontSender wavefrontSender;
+        private readonly IWeatherDataService weatherDataService;
         private readonly ILogger<ForecastController> logger;
 
         private static readonly string[] Summaries = new[]
@@ -20,9 +23,15 @@ namespace Tap.Dotnet.Weather.Api.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public ForecastController(IApiHelper apiHelper, ILogger<ForecastController> logger)
+        public ForecastController(
+            IWeatherBitService weatherBitService, 
+            IWavefrontSender wavefrontSender, 
+            IWeatherDataService weatherDataService,
+            ILogger<ForecastController> logger)
         {
-            this.apiHelper = apiHelper;
+            this.weatherBitService = weatherBitService;
+            this.wavefrontSender = wavefrontSender;
+            this.weatherDataService = weatherDataService;
             this.logger = logger;
         }
 
@@ -74,7 +83,7 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                     //        weatherInfo.Forecast.Add(weatherForecast);
                     //    }
                     //}
-                    //else if(response.StatusCode == HttpStatusCode.TooManyRequests)
+                    //else if(response.StatusCode == HttpStatusCode.TooManyRequests) // if free limits are exceeded, return random
                     //{
                     weatherInfo.CityName = "Palo Alto";
                     weatherInfo.StateCode = "CA";
@@ -103,9 +112,9 @@ namespace Tap.Dotnet.Weather.Api.Controllers
             tags.Add("DeploymentType", "Environment");
 
             // save as storage in wavefront
-            this.apiHelper.WavefrontSender.SendMetric("MinimumRandomForecast", min,
+            this.wavefrontSender.SendMetric("MinimumRandomForecast", min,
                 DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow), "tap-dotnet-api-weather-env", tags);
-            this.apiHelper.WavefrontSender.SendMetric("MaximumRandomForecast", max,
+            this.wavefrontSender.SendMetric("MaximumRandomForecast", max,
                 DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow), "tap-dotnet-api-weather-env", tags);
 
             // report metrics
@@ -116,7 +125,7 @@ namespace Tap.Dotnet.Weather.Api.Controllers
             metricsBuilder.Report.ToWavefront(
               options =>
               {
-                  options.WavefrontSender = this.apiHelper.WavefrontSender;
+                  options.WavefrontSender = this.wavefrontSender;
                   options.Source = "tap-dotnet-api-weather"; // optional
                   options.WavefrontHistogram.ReportMinuteDistribution = true; // optional
                   options.ApplicationTags = applicationTags;

@@ -1,7 +1,8 @@
 using StackExchange.Redis;
 using Tap.Dotnet.Weather.Application;
 using Tap.Dotnet.Weather.Application.Interfaces;
-using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Application.Models;
+using Wavefront.SDK.CSharp.Common;
 using Wavefront.SDK.CSharp.DirectIngestion;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,22 +17,21 @@ var wavefrontUrl = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wav
 var wavefrontToken = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "token"));
 var cacheConnection = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "redis-cache-class-claim", "connection"));
 
-var wfSender = new WavefrontDirectIngestionClient.Builder(wavefrontUrl, wavefrontToken).Build();
-
+// setup Redis cache
 var redisConnection = ConnectionMultiplexer.Connect(cacheConnection);
-//var cacheServer = redisConnection.GetServer(cacheConnection);
+// var cacheServer = redisConnection.GetServer(cacheConnection);
 var cacheDb = redisConnection.GetDatabase();
 
 builder.Services.AddSingleton<IDatabase>(cacheDb);
 
-var apiHelper = new ApiHelper()
-{
-    WeatherApi = weatherApi,
-    WavefrontSender = wfSender,
-    //CacheDb = cacheDb
-};
+// setup weather api service
+builder.Services.AddSingleton<IWeatherApi>(new WeatherApi() { Url = weatherApi });
 
-builder.Services.AddSingleton<IApiHelper>(apiHelper);
+// setup wavefront service
+var wfSender = new WavefrontDirectIngestionClient.Builder(wavefrontUrl, wavefrontToken).Build();
+builder.Services.AddSingleton<IWavefrontSender>(wfSender);
+
+// weather app
 builder.Services.AddSingleton<IWeatherApplication, WeatherApplication>();
 
 // Add services to the container.

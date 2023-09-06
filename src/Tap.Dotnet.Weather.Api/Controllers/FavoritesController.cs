@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net;
-using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
 
 namespace Tap.Dotnet.Weather.Api.Controllers
@@ -10,12 +10,12 @@ namespace Tap.Dotnet.Weather.Api.Controllers
     [ApiController]
     public class FavoritesController : ControllerBase
     {
-        private readonly IApiHelper apiHelper;
+        private readonly IWeatherDataService weatherDataService;
         private readonly ILogger<ForecastController> logger;
 
-        public FavoritesController(IApiHelper apiHelper, ILogger<ForecastController> logger)
+        public FavoritesController(IWeatherDataService weatherDataService, ILogger<ForecastController> logger)
         {
-            this.apiHelper = apiHelper;
+            this.weatherDataService = weatherDataService;
             this.logger = logger;
         }
 
@@ -33,7 +33,7 @@ namespace Tap.Dotnet.Weather.Api.Controllers
 
                 using (var httpClient = new HttpClient(handler))
                 {
-                    httpClient.BaseAddress = new Uri(this.apiHelper.WeatherDbApi);
+                    httpClient.BaseAddress = new Uri(this.weatherDataService.Url);
 
                     var response = httpClient.GetAsync($"favorites").Result;
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -70,7 +70,7 @@ namespace Tap.Dotnet.Weather.Api.Controllers
 
                 using (var httpClient = new HttpClient(handler))
                 {
-                    httpClient.BaseAddress = new Uri(this.apiHelper.WeatherDbApi);
+                    httpClient.BaseAddress = new Uri(this.weatherDataService.Url);
 
                     var result = httpClient.GetAsync($"favorites/{zipCode}").Result;
                 }

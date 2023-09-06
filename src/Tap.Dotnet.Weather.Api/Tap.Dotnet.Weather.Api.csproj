@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Tap.Dotnet.Weather.Common\Tap.Dotnet.Weather.Common.csproj" />
     <ProjectReference Include="..\Tap.Dotnet.Weather.Domain\Tap.Dotnet.Weather.Domain.csproj" />
     <ProjectReference Include="..\WeatherBit.Domain\WeatherBit.Domain.csproj" />
   </ItemGroup>

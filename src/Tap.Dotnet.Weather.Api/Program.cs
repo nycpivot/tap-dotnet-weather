@@ -1,5 +1,9 @@
-using Tap.Dotnet.Weather.Common;
+using Tap.Dotnet.Weather.Api;
+using Tap.Dotnet.Weather.Api.Interfaces;
+using Wavefront.SDK.CSharp.Common;
 using Wavefront.SDK.CSharp.DirectIngestion;
+using WeatherBit.Domain;
+using WeatherBit.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,17 +16,23 @@ var weatherBitKey = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "we
 var wavefrontUrl = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "host"));
 var wavefrontToken = System.IO.File.ReadAllText(Path.Combine(serviceBindings, "wavefront-api-resource-claim", "token"));
 
-var wfSender = new WavefrontDirectIngestionClient.Builder(wavefrontUrl, wavefrontToken).Build();
-
-var apiHelper = new ApiHelper()
+// setup weather bit service
+var weatherBitService = new WeatherBitService()
 {
-    WeatherBitUrl = weatherBitUrl,
-    WeatherBitKey = weatherBitKey,
-    WeatherDbApi = weatherDbApi,
-    WavefrontSender = wfSender
+    Url = weatherBitUrl,
+    Key = weatherBitKey
 };
 
-builder.Services.AddSingleton<IApiHelper>(apiHelper);
+builder.Services.AddSingleton<IWeatherBitService>(weatherBitService);
+
+// setup wavefront
+var wfSender = new WavefrontDirectIngestionClient.Builder(wavefrontUrl, wavefrontToken).Build();
+builder.Services.AddSingleton<IWavefrontSender>(wfSender);
+
+// setup weather data service
+var weatherDataService = new WeatherDataService() { Url = weatherDbApi };
+builder.Services.AddSingleton<IWeatherDataService>(weatherDataService);
+
 
 builder.Services.AddControllers();
 
