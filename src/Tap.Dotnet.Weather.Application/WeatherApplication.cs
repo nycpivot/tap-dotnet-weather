@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Immutable;
 using System.Net;
 using Tap.Dotnet.Weather.Application.Interfaces;
 using Tap.Dotnet.Weather.Application.Models;
@@ -32,13 +33,13 @@ namespace Tap.Dotnet.Weather.Application
             var traceId = Guid.NewGuid();
             var spanId = Guid.NewGuid();
 
-            //this.apiHelper.WavefrontSender.SendSpan(
-            //    "Get", 0, 1, "ForecastController", traceId, spanId,
-            //    ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
-            //    ImmutableList.Create(
-            //        new KeyValuePair<string, string>("application", "tap-dotnet-web-mvc"),
-            //        new KeyValuePair<string, string>("service", "GetWeather"),
-            //        new KeyValuePair<string, string>("http.method", "GET")), null);
+            this.wavefrontSender.SendSpan(
+                "Post", 0, 1, "WeatherApplication", traceId, spanId,
+                ImmutableList.Create(traceId), ImmutableList.Create(traceId),
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("service", "SaveFavorite"),
+                    new KeyValuePair<string, string>("http.method", "POST")), null);
 
             using (var handler = new HttpClientHandler())
             {
@@ -68,13 +69,13 @@ namespace Tap.Dotnet.Weather.Application
             var traceId = Guid.NewGuid();
             var spanId = Guid.NewGuid();
 
-            //this.apiHelper.WavefrontSender.SendSpan(
-            //    "Get", 0, 1, "ForecastController", traceId, spanId,
-            //    ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
-            //    ImmutableList.Create(
-            //        new KeyValuePair<string, string>("application", "tap-dotnet-web-mvc"),
-            //        new KeyValuePair<string, string>("service", "GetWeather"),
-            //        new KeyValuePair<string, string>("http.method", "GET")), null);
+            this.wavefrontSender.SendSpan(
+                "Get", 0, 1, "WeatherApplication", traceId, spanId,
+                ImmutableList.Create(traceId), ImmutableList.Create(traceId),
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("service", "GetHomeView"),
+                    new KeyValuePair<string, string>("http.method", "GET")), null);
 
             using (var handler = new HttpClientHandler())
             {
