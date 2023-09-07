@@ -79,7 +79,7 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             return View("Index", homeViewModel);
         }
 
-        [HttpGet]
+        [HttpPost]
         public ActionResult Randomize(HomeViewModel model)
         {
             var traceId = Guid.NewGuid();
