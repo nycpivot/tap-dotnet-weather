@@ -1,13 +1,14 @@
 using App.Metrics;
 using App.Metrics.Reporting.Wavefront.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System;
+using System.Net;
 using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
 using Wavefront.SDK.CSharp.Common.Application;
+using WeatherBit.Domain;
 using WeatherBit.Domain.Interfaces;
 
 namespace Tap.Dotnet.Weather.Api.Controllers
@@ -55,42 +56,42 @@ namespace Tap.Dotnet.Weather.Api.Controllers
 
                 using (var httpClient = new HttpClient(handler))
                 {
-                    //httpClient.BaseAddress = new Uri(this.apiHelper.WeatherBitUrl);
+                    httpClient.BaseAddress = new Uri(this.weatherBitService.Url);
 
-                    //var key = this.apiHelper.WeatherBitKey;
+                    var key = this.weatherBitService.Key;
 
-                    //var response = httpClient.GetAsync($"forecast/daily?postal_code={zipCode}&key={key}").Result;
-                    //if (response.StatusCode == HttpStatusCode.OK)
-                    //{
-                    //    var content = response.Content.ReadAsStringAsync().Result;
+                    var response = httpClient.GetAsync($"forecast/daily?postal_code={zipCode}&key={key}").Result;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var content = response.Content.ReadAsStringAsync().Result;
 
-                    //    var serializerSettings = new JsonSerializerSettings();
-                    //    serializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+                        var serializerSettings = new JsonSerializerSettings();
+                        serializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
 
-                    //    var weatherBitInfo = JsonConvert.DeserializeObject<WeatherBitInfo>(content, serializerSettings);
+                        var weatherBitInfo = JsonConvert.DeserializeObject<WeatherBitInfo>(content, serializerSettings);
 
-                    //    weatherInfo.CityName = weatherBitInfo.city_name;
-                    //    weatherInfo.StateCode = weatherBitInfo.state_code;
-                    //    weatherInfo.CountryCode = weatherBitInfo.country_code;
-                    //    weatherInfo.Latitude = weatherBitInfo.lat;
-                    //    weatherInfo.Longitude = weatherBitInfo.lon;
-                    //    weatherInfo.TimeZone = weatherBitInfo.timezone;
+                        weatherInfo.CityName = weatherBitInfo.city_name;
+                        weatherInfo.StateCode = weatherBitInfo.state_code;
+                        weatherInfo.CountryCode = weatherBitInfo.country_code;
+                        weatherInfo.Latitude = weatherBitInfo.lat;
+                        weatherInfo.Longitude = weatherBitInfo.lon;
+                        weatherInfo.TimeZone = weatherBitInfo.timezone;
 
-                    //    foreach(var weatherBitForecast in weatherBitInfo.data)
-                    //    {
-                    //        var weatherForecast = new WeatherForecast();
-                    //        weatherForecast.Date = Convert.ToDateTime(weatherBitForecast.datetime);
-                    //        weatherForecast.TemperatureC = Convert.ToSingle(weatherBitForecast.temp);
-                    //        weatherForecast.Description = weatherBitForecast.weather.description;
+                        foreach (var weatherBitForecast in weatherBitInfo.data)
+                        {
+                            var weatherForecast = new WeatherForecast();
+                            weatherForecast.Date = Convert.ToDateTime(weatherBitForecast.datetime);
+                            weatherForecast.TemperatureC = Convert.ToSingle(weatherBitForecast.temp);
+                            weatherForecast.Description = weatherBitForecast.weather.description;
 
-                    //        weatherInfo.Forecast.Add(weatherForecast);
-                    //    }
-                    //}
-                    //else if(response.StatusCode == HttpStatusCode.TooManyRequests) // if free limits are exceeded, return random
-                    //{
-                    weatherInfo.CityName = "Palo Alto";
-                    weatherInfo.StateCode = "CA";
-                    weatherInfo.CountryCode = "US";
+                            weatherInfo.Forecast.Add(weatherForecast);
+                        }
+                    }
+                    else if (response.StatusCode == HttpStatusCode.TooManyRequests) // if free limits are exceeded, return random
+                    {
+                        weatherInfo.CityName = "Palo Alto";
+                        weatherInfo.StateCode = "CA";
+                        weatherInfo.CountryCode = "US";
 
                         var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
                         {
@@ -104,8 +105,8 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                         {
                             weatherInfo.Forecast.Add(day);
                         }
-                    //}
                 }
+            }
             }
 
             var min = Convert.ToDouble(weatherInfo.Forecast.Min(t => t.TemperatureC));
@@ -145,7 +146,7 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                     "GetWeatherForecast", start, end, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
                     ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                     ImmutableList.Create(
-                        new KeyValuePair<string, string>("application", "tap-dotnet-api-weather"),
+                        new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
                         new KeyValuePair<string, string>("service", "GetWeatherForecast"),
                         new KeyValuePair<string, string>("zipcode", zipCode),
                         new KeyValuePair<string, string>("http.method", "GET")), null);

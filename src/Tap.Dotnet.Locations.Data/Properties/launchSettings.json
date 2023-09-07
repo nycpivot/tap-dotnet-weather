@@ -4,27 +4,25 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:61685",
+      "applicationUrl": "http://localhost:54369",
       "sslPort": 0
     }
   },
   "profiles": {
-    "Tap.Dotnet.Api.Weather": {
+    "Tap.Dotnet.Locations.Data": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "forecast",
-      "applicationUrl": "http://localhost:5149",
+      "launchUrl": "weatherforecast",
+      "applicationUrl": "http://localhost:5221",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "SERVICE_BINDING_ROOT": "/bindings/",
-        "WEATHER_DB_API": "http://localhost:5223"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "forecast/10001",
+      "launchUrl": "weatherforecast",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
