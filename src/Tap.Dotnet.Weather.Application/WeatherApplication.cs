@@ -80,7 +80,7 @@ namespace Tap.Dotnet.Weather.Application
                     }
 
                     // get weather forecast for incoming zip code
-                    var forecastResponse = httpClient.GetAsync($"random").Result;
+                    var forecastResponse = httpClient.GetAsync($"forecast/random").Result;
                     if (forecastResponse.StatusCode == HttpStatusCode.OK)
                     {
                         var content = forecastResponse.Content.ReadAsStringAsync().Result;

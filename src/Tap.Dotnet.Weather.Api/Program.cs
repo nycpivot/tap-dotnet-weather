@@ -1,3 +1,4 @@
+using Prometheus;
 using Tap.Dotnet.Weather.Api;
 using Tap.Dotnet.Weather.Api.Interfaces;
 using Wavefront.SDK.CSharp.Common;
@@ -41,7 +42,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseAuthorization();
+app.UseHttpMetrics(); // prometheus
 
 app.MapControllers();
+app.MapMetrics(); // prometheus
 
 app.Run();
