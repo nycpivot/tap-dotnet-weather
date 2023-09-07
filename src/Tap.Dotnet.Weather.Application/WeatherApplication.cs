@@ -31,12 +31,17 @@ namespace Tap.Dotnet.Weather.Application
         {
             var homeViewModel = new HomeViewModel();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             this.wavefrontSender.SendSpan(
-                "Post", 0, 1, "WeatherApplication", traceId, Guid.NewGuid(),
+                "Post", start, end, "WeatherApplication", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "SaveFavorite"),
+                    new KeyValuePair<string, string>("zipcode", zipCode),
                     new KeyValuePair<string, string>("http.method", "POST")), null);
 
             using (var handler = new HttpClientHandler())
@@ -65,12 +70,17 @@ namespace Tap.Dotnet.Weather.Application
         {
             var homeViewModel = new HomeViewModel();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             this.wavefrontSender.SendSpan(
-                "Get", 0, 1, "WeatherApplication", traceId, Guid.NewGuid(),
+                "Get", start, end, "WeatherApplication", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "GetHomeView"),
+                    new KeyValuePair<string, string>("zipcode", zipCode),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
             using (var handler = new HttpClientHandler())

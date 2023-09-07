@@ -33,12 +33,17 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             var traceId = Guid.NewGuid();
             var spanId = Guid.NewGuid();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             this.wavefrontSender.SendSpan(
-                "Index", 0, 1, "tap-dotnet-core-web-mvc-env", traceId, Guid.NewGuid(),
+                "Index", start, end, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
-                    new KeyValuePair<string, string>("application", "tap-dotnet-core-web-mvc-env"), // "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "Index"),
+                    new KeyValuePair<string, string>("zipcode", model.WeatherInfo.ZipCode),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
             var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode, traceId, spanId);
@@ -54,12 +59,17 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             var traceId = Guid.NewGuid();
             var spanId = Guid.NewGuid();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             this.wavefrontSender.SendSpan(
-                "Search", 0, 1, "tap-dotnet-core-web-mvc-env", traceId, Guid.NewGuid(),
+                "Search", start, end, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
-                    new KeyValuePair<string, string>("application", "tap-dotnet-core-web-mvc-env"),
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "Search"),
+                    new KeyValuePair<string, string>("zipcode", model.WeatherInfo.ZipCode),
                     new KeyValuePair<string, string>("http.method", "GET")), null);
 
             var homeViewModel = this.weatherApplication.GetForecast(model.WeatherInfo.ZipCode, traceId, spanId);
@@ -75,12 +85,17 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             var traceId = Guid.NewGuid();
             var spanId = Guid.NewGuid();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             this.wavefrontSender.SendSpan(
-                "Save", 0, 1, "tap-dotnet-core-web-mvc-env", traceId, Guid.NewGuid(),
+                "Save", start, end, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
-                    new KeyValuePair<string, string>("application", "tap-dotnet-core-web-mvc-env"),
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
                     new KeyValuePair<string, string>("service", "Save"),
+                    new KeyValuePair<string, string>("zipcode", model.WeatherInfo.ZipCode),
                     new KeyValuePair<string, string>("http.method", "POST")), null);
 
             var homeViewModel = this.weatherApplication.SaveFavorite(model.WeatherInfo.ZipCode, traceId, spanId);

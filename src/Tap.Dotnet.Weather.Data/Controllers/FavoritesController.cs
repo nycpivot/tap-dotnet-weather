@@ -28,11 +28,15 @@ namespace Tap.Dotnet.Weather.Data.Controllers
         {
             if (this.Request.Headers.ContainsKey("X-TraceId"))
             {
+                var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+                Thread.Sleep(100);
+                var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
                 var traceId = this.Request.Headers["X-TraceId"][0];
                 var spanId = this.Request.Headers["X-SpanId"][0];
 
                 this.wavefrontSender.SendSpan(
-                    "Get", 0, 1, "WeatherData", new Guid(traceId), Guid.NewGuid(),
+                    "Get", start, end, "WeatherData", new Guid(traceId), Guid.NewGuid(),
                     ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                     ImmutableList.Create(
                         new KeyValuePair<string, string>("application", "tap-dotnet-weather-data"),
@@ -51,15 +55,20 @@ namespace Tap.Dotnet.Weather.Data.Controllers
         {
             if (this.Request.Headers.ContainsKey("X-TraceId"))
             {
+                var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+                Thread.Sleep(100);
+                var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
                 var traceId = this.Request.Headers["X-TraceId"][0];
                 var spanId = this.Request.Headers["X-SpanId"][0];
 
                 this.wavefrontSender.SendSpan(
-                    "Save", 0, 1, "WeatherData", new Guid(traceId), Guid.NewGuid(),
+                    "Save", start, end, "WeatherData", new Guid(traceId), Guid.NewGuid(),
                     ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                     ImmutableList.Create(
                         new KeyValuePair<string, string>("application", "tap-dotnet-weather-data"),
                         new KeyValuePair<string, string>("service", "WeatherData.FavoritesController"),
+                        new KeyValuePair<string, string>("zipcode", zipCode),
                         new KeyValuePair<string, string>("http.method", "POST")), null);
             }
 

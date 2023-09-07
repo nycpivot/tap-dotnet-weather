@@ -142,11 +142,12 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                 var spanId = this.Request.Headers["X-SpanId"][0];
 
                 this.wavefrontSender.SendSpan(
-                    "GetWeatherForecast", 0, 1, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                    "GetWeatherForecast", start, end, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
                     ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                     ImmutableList.Create(
                         new KeyValuePair<string, string>("application", "tap-dotnet-api-weather"),
                         new KeyValuePair<string, string>("service", "GetWeatherForecast"),
+                        new KeyValuePair<string, string>("zipcode", zipCode),
                         new KeyValuePair<string, string>("http.method", "GET")), null);
             }
 

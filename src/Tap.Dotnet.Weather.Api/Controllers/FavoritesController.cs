@@ -4,6 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Net;
+using System.Reflection;
 using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
@@ -33,11 +34,15 @@ namespace Tap.Dotnet.Weather.Api.Controllers
         {
             var favorites = new List<Favorite>();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             var traceId = this.Request.Headers["X-TraceId"][0];
             var spanId = this.Request.Headers["X-SpanId"][0];
 
             this.wavefrontSender.SendSpan(
-                "Get", 0, 1, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                "Get", start, end, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
@@ -83,15 +88,20 @@ namespace Tap.Dotnet.Weather.Api.Controllers
         {
             var favorites = new List<Favorite>();
 
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
             var traceId = this.Request.Headers["X-TraceId"][0];
             var spanId = this.Request.Headers["X-SpanId"][0];
 
             this.wavefrontSender.SendSpan(
-                "Save", 0, 1, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                "Save", start, end, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
                 ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
                 ImmutableList.Create(
                     new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
                     new KeyValuePair<string, string>("service", "WeatherApi.FavoritesController"),
+                    new KeyValuePair<string, string>("zipcode", zipCode),
                     new KeyValuePair<string, string>("http.method", "POST")), null);
 
             using (var handler = new HttpClientHandler())
