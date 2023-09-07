@@ -127,6 +127,12 @@
                     </div>
                 }
 
+                @using (Html.BeginForm("Randomize", "Home", FormMethod.Post, new { @class = "d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" }))
+                {
+                    @Html.HiddenFor(model => model.WeatherInfo.ZipCode)
+                    <button class="btn btn-primary" type="submit" style="text-align: right;">Add To Favorites</button>
+                }
+
                 @using (Html.BeginForm("Save", "Home", FormMethod.Post, new { @class = "d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" }))
                 {
                     @Html.HiddenFor(model => model.WeatherInfo.ZipCode)

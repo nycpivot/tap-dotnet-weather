@@ -79,6 +79,30 @@ namespace Tap.Dotnet.Weather.Web.Controllers
             return View("Index", homeViewModel);
         }
 
+        [HttpGet]
+        public ActionResult Randomize(HomeViewModel model)
+        {
+            var traceId = Guid.NewGuid();
+            var spanId = Guid.NewGuid();
+
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
+            this.wavefrontSender.SendSpan(
+                "Randomize", start, end, "tap-dotnet-weather-web", traceId, Guid.NewGuid(),
+                ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                ImmutableList.Create(
+                    new KeyValuePair<string, string>("application", "tap-dotnet-weather-web"),
+                    new KeyValuePair<string, string>("service", "Randomize"),
+                    new KeyValuePair<string, string>("zipcode", "random"),
+                    new KeyValuePair<string, string>("http.method", "GET")), null);
+
+            var homeViewModel = this.weatherApplication.GetRandom(traceId, spanId);
+
+            return View("Index", homeViewModel);
+        }
+
         [HttpPost]
         public ActionResult Save(HomeViewModel model)
         {

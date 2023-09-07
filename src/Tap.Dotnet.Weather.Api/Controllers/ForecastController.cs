@@ -2,8 +2,10 @@ using App.Metrics;
 using App.Metrics.Reporting.Wavefront.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Prometheus;
 using System.Collections.Immutable;
 using System.Net;
+using System.Reflection.Emit;
 using Tap.Dotnet.Weather.Api.Interfaces;
 using Tap.Dotnet.Weather.Domain;
 using Wavefront.SDK.CSharp.Common;
@@ -21,6 +23,13 @@ namespace Tap.Dotnet.Weather.Api.Controllers
         private readonly IWavefrontSender wavefrontSender;
         private readonly IWeatherDataService weatherDataService;
         private readonly ILogger<ForecastController> logger;
+
+        private static readonly Counter TempsBelowZero = Metrics
+            .CreateCounter("TempsBelowZero", "Number of temperatures below zero.",
+                new CounterConfiguration { SuppressInitialValue = true });
+        private static readonly Counter TempsAbove100 = Metrics
+            .CreateCounter("TempsAboveOneHundred", "Number of temperatures above one hundred.",
+                new CounterConfiguration { SuppressInitialValue = true });
 
         private static readonly string[] Summaries = new[]
 {
@@ -89,24 +98,9 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                     }
                     else if (response.StatusCode == HttpStatusCode.TooManyRequests) // if free limits are exceeded, return random
                     {
-                        weatherInfo.CityName = "Palo Alto";
-                        weatherInfo.StateCode = "CA";
-                        weatherInfo.CountryCode = "US";
-
-                        var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-                        {
-                            Date = DateTime.Now.AddDays(index),
-                            TemperatureC = Random.Shared.Next(-20, 55),
-                            Description = Summaries[Random.Shared.Next(Summaries.Length)]
-                        })
-                        .ToArray();
-
-                        foreach(var day in forecast)
-                        {
-                            weatherInfo.Forecast.Add(day);
-                        }
+                        weatherInfo = GetRandom();
+                    }
                 }
-            }
             }
 
             var min = Convert.ToDouble(weatherInfo.Forecast.Min(t => t.TemperatureC));
@@ -151,6 +145,54 @@ namespace Tap.Dotnet.Weather.Api.Controllers
                         new KeyValuePair<string, string>("zipcode", zipCode),
                         new KeyValuePair<string, string>("http.method", "GET")), null);
             }
+
+            return weatherInfo;
+        }
+
+        [HttpGet]
+        [Route("random")]
+        public WeatherInfo GetRandom()
+        {
+            var weatherInfo = new WeatherInfo();
+
+            var start = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+            Thread.Sleep(100);
+            var end = DateTimeUtils.UnixTimeMilliseconds(DateTime.UtcNow);
+
+            if (this.Request.Headers.ContainsKey("X-TraceId") && this.Request.Headers.ContainsKey("X-SpanId"))
+            {
+                var traceId = this.Request.Headers["X-TraceId"][0];
+                var spanId = this.Request.Headers["X-SpanId"][0];
+
+                this.wavefrontSender.SendSpan(
+                    "GetWeatherForecast", start, end, "WeatherApi", new Guid(traceId), Guid.NewGuid(),
+                    ImmutableList.Create(new Guid("82dd7b10-3d65-4a03-9226-24ff106b5041")), null,
+                    ImmutableList.Create(
+                        new KeyValuePair<string, string>("application", "tap-dotnet-weather-api"),
+                        new KeyValuePair<string, string>("service", "GetWeatherForecast"),
+                        new KeyValuePair<string, string>("zipcode", "random"),
+                        new KeyValuePair<string, string>("http.method", "GET")), null);
+            }
+
+            weatherInfo.CityName = "Palo Alto";
+            weatherInfo.StateCode = "CA";
+            weatherInfo.CountryCode = "US";
+
+            var forecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Description = Summaries[Random.Shared.Next(Summaries.Length)]
+            })
+            .ToArray();
+
+            var belowZero = forecast.Count(f => f.TemperatureF < 0);
+            var above100 = forecast.Count(f => f.TemperatureF > 100);
+
+            TempsBelowZero.Inc(belowZero);
+            TempsAbove100.Inc(above100);
+
+            weatherInfo.Forecast = forecast;
 
             return weatherInfo;
         }
